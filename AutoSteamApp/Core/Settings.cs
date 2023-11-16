@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Linq;
 using Keystroke.API;
@@ -8,7 +8,27 @@ namespace AutoSteamApp.Core
     public static class Settings
     {
         #region magic numbers
-        public static string SupportedGameVersion = "421652"; // update 15.21.00
+        public static string _SupportedGameVersion = "";
+        public static string SupportedGameVersion
+        {
+            get
+            {
+                if (!"".Equals(_SupportedGameVersion)) { return _SupportedGameVersion; }
+
+                if (ConfigurationManager.AppSettings.AllKeys.Any(key => key == "SupportedGameVersion"))
+                {
+                    try
+                    {
+                        return (_SupportedGameVersion = ConfigurationManager.AppSettings["SupportedGameVersion"].Trim());
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError($"Get value for 'SupportedGameVersion': [{_SupportedGameVersion}] error. Will use default (F2) instead! Exception: {ex.Message}");
+                    }
+                }
+                return _SupportedGameVersion;
+            }
+        }
 
         public static ulong Off_Base = 0x140000000;
         public static ulong Off_SteamworksCombo = 0x4F859F0; // update 15.20.00
@@ -112,12 +132,12 @@ namespace AutoSteamApp.Core
 
                 if (ConfigurationManager.AppSettings.AllKeys.Any(key => key == "keyCodeStart"))
                 {
-                    if (int.TryParse(ConfigurationManager.AppSettings["keyCodeStart"].Trim(), out _keyCodeStart)) 
+                    if (int.TryParse(ConfigurationManager.AppSettings["keyCodeStart"].Trim(), out _keyCodeStart))
                     {
                         try
                         {
                             KeyCode key = (KeyCode)_keyCodeStart;
-                            
+
                             return _keyCodeStart;
                         }
                         catch (Exception ex)
@@ -178,7 +198,7 @@ namespace AutoSteamApp.Core
 
                 if (ConfigurationManager.AppSettings.AllKeys.Any(key => key == "keyCodeStop"))
                 {
-                    if(int.TryParse(ConfigurationManager.AppSettings["keyCodeStop"].Trim(), out _keyCodeStop))
+                    if (int.TryParse(ConfigurationManager.AppSettings["keyCodeStop"].Trim(), out _keyCodeStop))
                     {
                         try
                         {
@@ -200,7 +220,7 @@ namespace AutoSteamApp.Core
                 return (_keyCodeStop = 27);
             }
         }
-        
+
         private static int _keyCutsceneSkip = -1;
         public static int KeyCutsceneSkip
         {
